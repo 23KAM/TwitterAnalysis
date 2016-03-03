@@ -1,11 +1,13 @@
 """
 Author: KAM Wright
-Description: #PUT STUFF HERE!#
+Description: This code pull information on tweets related to screennames and outputs into an Excel file
 Version: 1
 
 """
        
-import tweepy, openpyxl as xl, datetime
+import tweepy
+import openpyxl as xl
+import datetime
 
 consumer_key = 'MC7lINcv3bYIcDroF3WhXjZPa'
 consumer_secret = 'pYTtJJcodQnq8lFyDzSqRo2aOdRvnQxJkXijuomKjJHRAHMBPm'
@@ -19,7 +21,12 @@ def get_all_tweets(screen_name, limit=None):
     	
     alltweets = []
     	
-    new_tweets = api.user_timeline(screen_name = screen_name,count=200)
+    try:
+        new_tweets = api.user_timeline(screen_name = screen_name,count=200)
+    except:
+        print("Couldn't find tweets for user: {0}".format(screen_name))
+        return None
+    
     alltweets.extend(new_tweets)
     oldest = alltweets[-1].id - 1
     	
@@ -57,22 +64,25 @@ def create_tweet_sheet(alltweets):
 if __name__ == '__main__':
     
     # First lets define a cut off date and user list
-    cut_off_date = datetime.datetime(2016,2,24,23,59,59)
-    users = ['ConservativesIN']
+    cut_off_date = datetime.datetime(2016,3,2,23,59,59)
+    users = ['ConservativesIN','reformineurope','consforbritain','grassroots_out','labour4europe','Scientists4EU','labourleave','StrongerIn','LeaveEUOfficial','vote_leave']
     headings = ['Date','Tweet','Retweets','Favourites','Retweet?','Quoted?','Followers','Following','Retweets-retweeted','favourites-retweeted']
-
     # Now lets create an excel spreadsheet for the data  
     wb = xl.Workbook()
 
     # Loop over the users and get their tweets from 7 days before the cutoff
     for user in users:
-        
+
+        # Get all the tweets
+        all_tweets = get_all_tweets(user, 500)
+
+        if all_tweets is None:
+            continue
+        filt_tweets = filter_week(all_tweets, cut_off_date)
+
         # Create the worksheet and give it a name and add some column heacdings
         ws = wb.create_sheet(0)
         ws.title = user
-
-        all_tweets = get_all_tweets(user, 500)
-        filt_tweets = filter_week(all_tweets, cut_off_date)
         
         for row in range(0, len(filt_tweets)+1):
 
