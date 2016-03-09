@@ -1,13 +1,11 @@
-"""
-Author: KAM Wright
-Description: This code pull information on tweets related to screennames and outputs into an Excel file
-Version: 1
-
-"""
-       
-import tweepy
+# Author: KAM Wright
+# Description: This code pull information on tweets related to screennames and outputs into an Excel file
+# Version: 1
+  
 import openpyxl as xl
 import datetime
+import sys
+import tweepy
 
 consumer_key = 'MC7lINcv3bYIcDroF3WhXjZPa'
 consumer_secret = 'pYTtJJcodQnq8lFyDzSqRo2aOdRvnQxJkXijuomKjJHRAHMBPm'
@@ -71,31 +69,33 @@ def create_tweet_sheet(tweets, wb, user):
             wsc = ws.cell(column = 2, row=row+1)
             wsc.value = text
                 
-            wsc = ws.cell(column = 3, row=row+1)
+            wsc = ws.cell(column = 4, row=row+1)
             wsc.value = tweets[row-1].retweet_count
                 
-            wsc = ws.cell(column = 4, row=row+1)
+            wsc = ws.cell(column = 5, row=row+1)
             wsc.value = tweets[row-1].favorite_count
                 
-            wsc = ws.cell(column = 5, row=row+1)
+            wsc = ws.cell(column = 6, row=row+1)
             wsc.value = retweet
                 
-            wsc = ws.cell(column = 6, row=row+1)
+            wsc = ws.cell(column = 7, row=row+1)
             wsc.value = tweets[row-1].is_quote_status
                 
-            wsc = ws.cell(column = 7, row=row+1)
+            wsc = ws.cell(column = 8, row=row+1)
             wsc.value = tweets[row-1].author.followers_count
                 
-            wsc = ws.cell(column = 8, row=row+1)
+            wsc = ws.cell(column = 9, row=row+1)
             wsc.value = tweets[row-1].author.friends_count
 
 
-if __name__ == '__main__':
-    
+def main(args):
+
     # First lets define a cut off date and user list
-    cut_off_date = datetime.datetime(2016,3,2,23,59,59)
+    cut_off_date = datetime.datetime(int(args[0]),int(args[1]),int(args[2]),
+                                     int(args[3]),int(args[4]),int(args[5]))
     users = ['ConservativesIN','reformineurope','consforbritain','grassroots_out','labour4europe','Scientists4EU','labourleave','StrongerIn','LeaveEUOfficial','vote_leave']
-    headings = ['Date','Tweet','Retweets','Favourites','Retweet?','Quoted?','Followers','Following','Retweets-retweeted','favourites-retweeted']
+    headings = ['Date','Tweet','Code','Retweets','Favourites','Retweet?','Quoted?','Followers','Following','Retweets-retweeted','favourites-retweeted']
+    
     # Now lets create an excel spreadsheet for the data  
     wb = xl.Workbook()
 
@@ -104,12 +104,14 @@ if __name__ == '__main__':
 
         # Get all the tweets
         all_tweets = get_all_tweets(user, 500)
-
-        if all_tweets is None:
-            continue
+        if all_tweets is None: continue
         filt_tweets = filter_week(all_tweets, cut_off_date)
 
         # Create the worksheet and give it a name and add some column heacdings
         create_tweet_sheet(filt_tweets, wb, user)
-        
+
+    # To Do: Conduct overall analysis and produce figures for results
     wb.save("C:\\Users\\kw0020\\TwitterData\\{0}.xlsx".format(cut_off_date.date()))
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
