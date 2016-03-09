@@ -48,7 +48,7 @@ def filter_week(alltweets, end_date):
     start_date = end_date - datetime.timedelta(days = 7)
     return  [tweet for tweet in alltweets if start_date <= tweet.created_at <= end_date]
          
-def create_tweet_sheet(tweets, wb, user):
+def create_tweet_sheet(tweets, wb, user, headings):
 
     ws = wb.create_sheet(0)
     ws.title = user
@@ -87,14 +87,13 @@ def create_tweet_sheet(tweets, wb, user):
             wsc = ws.cell(column = 9, row=row+1)
             wsc.value = tweets[row-1].author.friends_count
 
-
 def main(args):
 
     # First lets define a cut off date and user list
     cut_off_date = datetime.datetime(int(args[0]),int(args[1]),int(args[2]),
                                      int(args[3]),int(args[4]),int(args[5]))
     users = ['ConservativesIN','reformineurope','consforbritain','grassroots_out','labour4europe','Scientists4EU','labourleave','StrongerIn','LeaveEUOfficial','vote_leave']
-    headings = ['Date','Tweet','Code','Retweets','Favourites','Retweet?','Quoted?','Followers','Following','Retweets-retweeted','favourites-retweeted']
+    headings = ['Date','Tweet','Themes','Retweets','Favourites','Retweet?','Quoted?','Followers','Following','Retweets-retweeted','favourites-retweeted']
     
     # Now lets create an excel spreadsheet for the data  
     wb = xl.Workbook()
@@ -108,7 +107,7 @@ def main(args):
         filt_tweets = filter_week(all_tweets, cut_off_date)
 
         # Create the worksheet and give it a name and add some column heacdings
-        create_tweet_sheet(filt_tweets, wb, user)
+        create_tweet_sheet(filt_tweets, wb, user, headings)
 
     # To Do: Conduct overall analysis and produce figures for results
     wb.save("C:\\Users\\kw0020\\TwitterData\\{0}.xlsx".format(cut_off_date.date()))
