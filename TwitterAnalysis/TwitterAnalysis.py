@@ -50,16 +50,45 @@ def filter_week(alltweets, end_date):
     start_date = end_date - datetime.timedelta(days = 7)
     return  [tweet for tweet in alltweets if start_date <= tweet.created_at <= end_date]
          
-def create_tweet_sheet(alltweets):
+def create_tweet_sheet(tweets, wb, user):
 
-    #outtweets = [[tweet.id_str, tweet.created_at, tweet.text.encode("utf-8")] for tweet in alltweets]
-    
-    #with open('%s_tweets.csv' % screen_name, 'wb') as f:
-    #    writer = csv.writer(f)
-    #    writer.writerow(["id","created_at","text"])
-    #    writer.writerows(outtweets)
-    
-    return alltweets
+    ws = wb.create_sheet(0)
+    ws.title = user
+
+    for row in range(0, len(tweets)+1):
+
+        if row == 0:
+            for col, heading in enumerate(headings):
+                wsc = ws.cell(column = col+1, row=row+1)
+                wsc.value = heading
+        else:
+            text = tweets[row-1].text
+            retweet = tweets[row-1].retweeted or text[:2] == u'RT'
+                
+            wsc = ws.cell(column = 1, row=row+1)
+            wsc.value = tweets[row-1].created_at
+                
+            wsc = ws.cell(column = 2, row=row+1)
+            wsc.value = text
+                
+            wsc = ws.cell(column = 3, row=row+1)
+            wsc.value = tweets[row-1].retweet_count
+                
+            wsc = ws.cell(column = 4, row=row+1)
+            wsc.value = tweets[row-1].favorite_count
+                
+            wsc = ws.cell(column = 5, row=row+1)
+            wsc.value = retweet
+                
+            wsc = ws.cell(column = 6, row=row+1)
+            wsc.value = tweets[row-1].is_quote_status
+                
+            wsc = ws.cell(column = 7, row=row+1)
+            wsc.value = tweets[row-1].author.followers_count
+                
+            wsc = ws.cell(column = 8, row=row+1)
+            wsc.value = tweets[row-1].author.friends_count
+
 
 if __name__ == '__main__':
     
@@ -81,41 +110,6 @@ if __name__ == '__main__':
         filt_tweets = filter_week(all_tweets, cut_off_date)
 
         # Create the worksheet and give it a name and add some column heacdings
-        ws = wb.create_sheet(0)
-        ws.title = user
-        
-        for row in range(0, len(filt_tweets)+1):
-
-            if row == 0:
-                for col, heading in enumerate(headings):
-                    wsc = ws.cell(column = col+1, row=row+1)
-                    wsc.value = heading
-            else:
-                text = filt_tweets[row-1].text
-                retweet = filt_tweets[row-1].retweeted or text[:2] == u'RT'
-                
-                wsc = ws.cell(column = 1, row=row+1)
-                wsc.value = filt_tweets[row-1].created_at
-                
-                wsc = ws.cell(column = 2, row=row+1)
-                wsc.value = text
-                
-                wsc = ws.cell(column = 3, row=row+1)
-                wsc.value = filt_tweets[row-1].retweet_count
-                
-                wsc = ws.cell(column = 4, row=row+1)
-                wsc.value = filt_tweets[row-1].favorite_count
-                
-                wsc = ws.cell(column = 5, row=row+1)
-                wsc.value = retweet
-                
-                wsc = ws.cell(column = 6, row=row+1)
-                wsc.value = filt_tweets[row-1].is_quote_status
-                
-                wsc = ws.cell(column = 7, row=row+1)
-                wsc.value = filt_tweets[row-1].author.followers_count
-                
-                wsc = ws.cell(column = 8, row=row+1)
-                wsc.value = filt_tweets[row-1].author.friends_count
+        create_tweet_sheet(filt_tweets, wb, user)
         
     wb.save("C:\\Users\\kw0020\\TwitterData\\{0}.xlsx".format(cut_off_date.date()))
