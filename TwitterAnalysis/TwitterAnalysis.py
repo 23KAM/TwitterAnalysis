@@ -12,7 +12,7 @@ consumer_secret = 'pYTtJJcodQnq8lFyDzSqRo2aOdRvnQxJkXijuomKjJHRAHMBPm'
 access_key = '22926126-blDZEHzX7yAHKqMqFnemG1ngbV826kglw4rfnyGMa'
 access_secret = 'MRSOWlwRE5lqduqoofxCtaSVGxXr6z1DBIDkpqI5i6JQW'
 
-def get_all_tweets(screen_name, limit=None):
+def get_all_tweets(screen_name, end_date, limit=None):
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_key, access_secret)
     api = tweepy.API(auth)
@@ -38,10 +38,13 @@ def get_all_tweets(screen_name, limit=None):
             if len(alltweets) > limit:
                 alltweets = alltweets[:limit]
                 break
+
+        if alltweets[-1].created_at <= (end_date - datetime.timedelta(days = 7)):
+            break
             
     print "Finished getting {0} tweets from {1}".format(len(alltweets),screen_name)
      
-    return alltweets 
+    return filter_week(alltweets, end_date) 
          
 def filter_week(alltweets, end_date):
     
@@ -102,12 +105,11 @@ def main(args):
     for user in users:
 
         # Get all the tweets
-        all_tweets = get_all_tweets(user, 500)
+        all_tweets = get_all_tweets(user, cut_off_date)
         if all_tweets is None: continue
-        filt_tweets = filter_week(all_tweets, cut_off_date)
 
         # Create the worksheet and give it a name and add some column heacdings
-        create_tweet_sheet(filt_tweets, wb, user, headings)
+        create_tweet_sheet(all_tweets, wb, user, headings)
 
     # To Do: Conduct overall analysis and produce figures for results
     wb.save("C:\\Users\\kw0020\\TwitterData\\{0}.xlsx".format(cut_off_date.date()))
