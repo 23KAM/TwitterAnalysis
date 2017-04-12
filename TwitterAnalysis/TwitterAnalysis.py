@@ -7,10 +7,11 @@ import datetime
 import sys
 import tweepy
 
-consumer_key = 'MC7lINcv3bYIcDroF3WhXjZPa'
-consumer_secret = 'pYTtJJcodQnq8lFyDzSqRo2aOdRvnQxJkXijuomKjJHRAHMBPm'
-access_key = '22926126-blDZEHzX7yAHKqMqFnemG1ngbV826kglw4rfnyGMa'
-access_secret = 'MRSOWlwRE5lqduqoofxCtaSVGxXr6z1DBIDkpqI5i6JQW'
+consumer_key = '(INSERT YOUR KEY HERE)'
+consumer_secret = '(INSERT YOUR KEY HERE)'
+access_key = '(INSERT YOUR KEY HERE)'
+access_secret = '(INSERT YOUR KEY HERE)'
+
 
 def get_all_tweets(screen_name, end_date, limit=None):
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
